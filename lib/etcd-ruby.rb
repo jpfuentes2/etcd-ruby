@@ -16,30 +16,26 @@ module Etcd
     end
 
     def get key
-      url = build_url KEYS_URI, key
-      Request.request "GET", url
+      Request.request "GET", build_key_url(key)
     end
 
     def set key, value, options = {}
-      url = build_url KEYS_URI, key
       data = {
         value: value,
         ttl: options[:ttl],
         prevValue: options[:prev_value]
       }
 
-      Request.request "POST", url, data: data
+      Request.request "POST", build_key_url(key), data: data
     end
 
     def delete key
-      url = build_url KEYS_URI, key
-      Request.request "DELETE", url
+      Request.request "DELETE", build_key_url(key)
     end
 
     def list key
       remove_slash_prefix! key
-      url = build_url KEYS_URI, key
-      Request.request "GET", url
+      Request.request "GET", build_key_url(key)
     end
 
     def machines
@@ -66,6 +62,10 @@ module Etcd
     def build_url sub, key
       remove_slash_prefix! key
       "%s/%s/%s" % [@host, sub, key]
+    end
+
+    def build_key_url key
+      build_url KEYS_URI, key
     end
 
   end
